@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LatestPost } from "@/app/_components/post";
+import { LatestUrl } from "@/app/_components/url";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
 
@@ -9,7 +10,7 @@ export default async function Home() {
   const session = await auth();
 
   if (session?.user) {
-    void api.post.getLatest.prefetch();
+    void api.url.getLatest.prefetch();
   }
 
   return (
@@ -62,6 +63,7 @@ export default async function Home() {
           </div>
 
           {session?.user && <LatestPost />}
+          {session?.user && <LatestUrl />}
         </div>
       </main>
     </HydrateClient>
