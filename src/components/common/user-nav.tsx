@@ -1,4 +1,4 @@
-import { auth } from "@/server/auth";
+import { auth, signOut } from "@/server/auth";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import {
@@ -51,7 +51,7 @@ export async function UserNav() {
   if (!session?.user) {
     return (
       <Link
-        href="/api/auth/signin"
+        href="/dashboard"
         className={buttonVariants({
           variant: "outline",
           className: "group",
@@ -104,10 +104,13 @@ export async function UserNav() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/api/auth/signout">
-            <LogOut /> Sign Out
-          </Link>
+        <DropdownMenuItem
+          onClick={async () => {
+            "use server";
+            await signOut({ redirectTo: "/" });
+          }}
+        >
+          <LogOut /> Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

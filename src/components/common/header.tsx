@@ -8,7 +8,7 @@ import { UserNav } from "./user-nav";
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between p-4">
+    <header className="container sticky top-0 mx-auto flex items-center justify-between p-4">
       <div className="flex items-center gap-4">
         <LinkIcon />
         <H3>{TITLE}</H3>
