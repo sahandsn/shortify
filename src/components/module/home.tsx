@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export function Home() {
   return (
-    <main className="container mx-auto flex h-[calc(100vh-68px)] flex-col items-center gap-8 px-4 pt-[15%]">
+    <main className="flex flex-col items-center gap-8 pt-[15%]">
       <section className="text-center">
         <H1>Enhance Your Link Management</H1>
         <P>

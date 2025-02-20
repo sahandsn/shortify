@@ -20,7 +20,7 @@ export function LatestUrl() {
     <div className="w-full max-w-xs">
       {latestUrl ? (
         <p className="truncate">
-          Your most recent url: {latestUrl.genericDestination}
+          Your most recent url: {latestUrl.destination}
         </p>
       ) : (
         <p>You have no urls yet.</p>

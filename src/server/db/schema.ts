@@ -153,20 +153,14 @@ export const urls = createTable(
       () => new Date(),
     ),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
-    genericDestination: varchar("generic_destination", { length: 6 })
+    destination: varchar("destination", { length: 255 })
       .unique()
       .notNull()
       .$defaultFn(() => nanoid(6)),
-    customDestination: varchar("custom_destination", { length: 255 }).unique(),
     source: varchar("source").notNull(),
   },
   (url) => ({
-    genericDestinationIdx: index("generic_destination_idx").on(
-      url.genericDestination,
-    ),
-    customDestinationIdx: index("custom_destination_idx").on(
-      url.customDestination,
-    ),
+    destinationIdx: index("destination_idx").on(url.destination),
     userIdIdx: index("user_id_idx").on(url.userId),
   }),
 );
