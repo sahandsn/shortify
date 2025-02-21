@@ -152,7 +152,6 @@ export const urls = createTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
-    expiresAt: timestamp("expires_at", { withTimezone: true }),
     destination: varchar("destination", { length: 255 })
       .unique()
       .notNull()
