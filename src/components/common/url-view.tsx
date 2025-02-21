@@ -11,7 +11,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import { LineChart, Line, XAxis, CartesianGrid } from "recharts";
 import { H3 } from "../ui/typography";
 import { CheckCheck, Copy, RefreshCcw } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -103,13 +103,6 @@ export function UrlView(
                   type="category"
                   stroke="#fff"
                   tick={{ fill: "#fff" }}
-                />
-                <YAxis
-                  dataKey="count"
-                  type="number"
-                  stroke="#fff"
-                  tick={{ fill: "#fff" }}
-                  allowDecimals={false}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line
