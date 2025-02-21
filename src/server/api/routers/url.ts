@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq, count } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { urls } from "@/server/db/schema";
+import { urlAnalytics, urls } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
 
 export const urlRouter = createTRPCRouter({
@@ -20,6 +20,27 @@ export const urlRouter = createTRPCRouter({
         source: input.source,
         userId: ctx.session.user.id,
       });
+    }),
+
+  createAnalytics: protectedProcedure
+    .input(z.object({ source: z.string().url() }))
+    .mutation(async ({ ctx, input }) => {
+      const url = await ctx.db.query.urls.findFirst({
+        where: eq(urls.source, input.source),
+      });
+
+      if (!url) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "URL not found",
+        });
+      }
+
+      await ctx.db.insert(urlAnalytics).values({
+        urlId: url.id,
+      });
+
+      return url;
     }),
 
   getAllPaginated: protectedProcedure
