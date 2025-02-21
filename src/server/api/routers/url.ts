@@ -14,7 +14,12 @@ export const urlRouter = createTRPCRouter({
   }),
 
   createGeneric: protectedProcedure
-    .input(z.object({ source: z.string().url() }))
+    .input(
+      z.object({
+        source: z.string().url(),
+        description: z.string().optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.insert(urls).values({
         source: input.source,

@@ -14,16 +14,22 @@ export function Dashboard() {
   return (
     <main>
       <H1>Dashboard</H1>
-      <List>
-        {allUrl.items.map((item) => (
-          <UrlView {...item} key={item.id} />
-        ))}
-      </List>
-      <Pagination
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={allUrl.pagination.totalPages}
-      />
+      {allUrl.items.length > 0 ? (
+        <>
+          <List>
+            {allUrl.items.map((item) => (
+              <UrlView {...item} key={item.id} />
+            ))}
+          </List>
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={allUrl.pagination.totalPages}
+          />
+        </>
+      ) : (
+        <p>Add a url first.</p>
+      )}
     </main>
   );
 }

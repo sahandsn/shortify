@@ -152,11 +152,12 @@ export const urls = createTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
-    destination: varchar("destination", { length: 255 })
+    destination: varchar("destination", { length: 6 })
       .unique()
       .notNull()
       .$defaultFn(() => nanoid(6)),
     source: varchar("source").notNull(),
+    description: varchar("description", { length: 255 }),
   },
   (url) => ({
     destinationIdx: index("destination_idx").on(url.destination),
