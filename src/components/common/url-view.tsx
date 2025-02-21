@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "@mantine/hooks";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
+import { UrlDelete } from "./url-actions";
 
 export function UrlView(
   url: Readonly<
@@ -82,6 +83,7 @@ export function UrlView(
               >
                 {clipboard.copied ? <CheckCheck /> : <Copy />}
               </Button>
+              <UrlDelete {...url} />
             </section>
           </section>
         </CardTitle>

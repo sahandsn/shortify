@@ -144,7 +144,7 @@ export const urls = createTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     userId: varchar("user_id", { length: 255 })
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -180,7 +180,7 @@ export const urlAnalytics = createTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     urlId: varchar("url_id", { length: 255 })
-      .references(() => urls.id)
+      .references(() => urls.id, { onDelete: "cascade" })
       .notNull(),
     timestamp: timestamp("timestamp", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)

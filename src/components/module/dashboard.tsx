@@ -3,7 +3,7 @@
 import { api } from "@/trpc/react";
 import { useState } from "react";
 import { Pagination } from "../common/pagination";
-import { H1, List } from "../ui/typography";
+import { H1 } from "../ui/typography";
 import { UrlView } from "../common/url-view";
 
 export function Dashboard() {

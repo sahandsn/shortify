@@ -21,10 +21,30 @@ export const urlRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(urls).values({
+      return await ctx.db.insert(urls).values({
         source: input.source,
         userId: ctx.session.user.id,
       });
+    }),
+  deleteGeneric: protectedProcedure
+    .input(
+      z.object({
+        urlId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const deletedUrls = await ctx.db
+        .delete(urls)
+        .where(eq(urls.id, input.urlId))
+        .returning();
+
+      if (deletedUrls.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "URL with this ID does not exist",
+        });
+      }
+      return { deletedUrls, message: "URL deleted successfully!" };
     }),
 
   createAnalytics: protectedProcedure
@@ -87,21 +107,6 @@ export const urlRouter = createTRPCRouter({
   getAnalytics: protectedProcedure
     .input(z.object({ urlId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const url = await ctx.db.query.urls.findFirst({
-        where: (urls, { eq, and }) =>
-          and(eq(urls.id, input.urlId), eq(urls.userId, ctx.session.user.id)),
-        with: {
-          urlAnalytics: true,
-        },
-      });
-
-      if (!url) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "URL not found",
-        });
-      }
-
       const data = await ctx.db.query.urlAnalytics
         .findMany({
           where: eq(urlAnalytics.urlId, input.urlId),
