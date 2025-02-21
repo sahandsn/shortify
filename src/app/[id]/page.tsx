@@ -11,7 +11,6 @@ export default async function UrlPage({
 
   try {
     url = await api.url.createAnalytics({ destination: id });
-    console.log(url.source);
   } catch (error) {
     console.error(error);
     redirect("/not-found");
