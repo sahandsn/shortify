@@ -28,14 +28,17 @@ import { toast } from "sonner";
 
 export function UrlDelete(
   url: Readonly<
-    inferRouterOutputs<typeof urlRouter>["getAllPaginated"]["items"][number]
+    inferRouterOutputs<typeof urlRouter>["fetchUrls"]["items"][number]
   >,
 ) {
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
-  const { mutate, isPending } = api.url.deleteGeneric.useMutation({
+  const { mutate, isPending } = api.url.deleteUrl.useMutation({
     async onSuccess(response) {
-      await utils.url.getAllPaginated.invalidate();
+      await Promise.all([
+        utils.url.fetchUrls.invalidate(),
+        utils.url.countUrl.invalidate(),
+      ]);
       form.reset();
       toast.success(response.message);
       setOpen(false);

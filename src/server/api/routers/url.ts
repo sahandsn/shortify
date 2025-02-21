@@ -3,20 +3,35 @@ import { eq, count, and, ilike, or } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { urlAnalytics, urls } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { createGenericSchema, editGenericSchema } from "@/schema/url";
+import { createSchema, editSchema } from "@/schema/url";
+import { MAX_URL_COUNT } from "@/assets";
 
 export const urlRouter = createTRPCRouter({
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const url = await ctx.db.query.urls.findFirst({
-      orderBy: (urls, { desc }) => [desc(urls.createdAt)],
-    });
+  countUrl: protectedProcedure.query(async ({ ctx }) => {
+    const [result] = await ctx.db
+      .select({
+        count: count(),
+      })
+      .from(urls)
+      .where(eq(urls.userId, ctx.session.user.id));
 
-    return url ?? null;
+    return result?.count ?? 0;
   }),
 
-  createGeneric: protectedProcedure
-    .input(createGenericSchema)
+  createUrl: protectedProcedure
+    .input(createSchema)
     .mutation(async ({ ctx, input }) => {
+      const [countResult] = await ctx.db
+        .select({ count: count() })
+        .from(urls)
+        .where(eq(urls.userId, ctx.session.user.id));
+
+      if ((countResult?.count ?? 0) >= MAX_URL_COUNT) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: `Maximum limit of ${MAX_URL_COUNT} URLs reached`,
+        });
+      }
       const createdUrls = await ctx.db
         .insert(urls)
         .values({
@@ -33,8 +48,8 @@ export const urlRouter = createTRPCRouter({
       }
       return { rows: createdUrls, message: "URL added successfully!" };
     }),
-  editGeneric: protectedProcedure
-    .input(editGenericSchema)
+  editUrl: protectedProcedure
+    .input(editSchema)
     .mutation(async ({ ctx, input }) => {
       const existingUrl = await ctx.db.query.urls.findFirst({
         where: (urls, { and, eq }) =>
@@ -70,7 +85,7 @@ export const urlRouter = createTRPCRouter({
         message: "URL updated successfully!",
       };
     }),
-  deleteGeneric: protectedProcedure
+  deleteUrl: protectedProcedure
     .input(
       z.object({
         urlId: z.string(),
@@ -91,7 +106,7 @@ export const urlRouter = createTRPCRouter({
       return { deletedUrls, message: "URL deleted successfully!" };
     }),
 
-  createAnalytics: protectedProcedure
+  createAnalytic: protectedProcedure
     .input(z.object({ destination: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const url = await ctx.db.query.urls.findFirst({
@@ -112,7 +127,7 @@ export const urlRouter = createTRPCRouter({
       return url;
     }),
 
-  getAllPaginated: protectedProcedure
+  fetchUrls: protectedProcedure
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -156,7 +171,7 @@ export const urlRouter = createTRPCRouter({
       };
     }),
 
-  getAnalytics: protectedProcedure
+  fetchAnalytics: protectedProcedure
     .input(z.object({ urlId: z.string() }))
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.query.urlAnalytics

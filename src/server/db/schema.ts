@@ -7,7 +7,6 @@ import {
   text,
   timestamp,
   varchar,
-  boolean,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 import { nanoid } from "nanoid";
@@ -55,8 +54,6 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
-  // business logic
-  proVerified: boolean("pro_verified").default(false).notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

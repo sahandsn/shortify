@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-export const createGenericSchema = z.object({
+export const createSchema = z.object({
   source: z.string().url(),
   description: z.string().optional(),
 });
 
-export const editGenericSchema = createGenericSchema.extend({
+export const editSchema = createSchema.extend({
   id: z.string(),
 });

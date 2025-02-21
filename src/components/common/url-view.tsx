@@ -23,11 +23,11 @@ import { UrlEdit } from "./url-edit";
 
 export function UrlView(
   url: Readonly<
-    inferRouterOutputs<typeof urlRouter>["getAllPaginated"]["items"][number]
+    inferRouterOutputs<typeof urlRouter>["fetchUrls"]["items"][number]
   >,
 ) {
   const clipboard = useClipboard({ timeout: 1000 });
-  const { data, isError, error, isFetching } = api.url.getAnalytics.useQuery({
+  const { data, isError, error, isFetching } = api.url.fetchAnalytics.useQuery({
     urlId: url.id,
   });
   const utils = api.useUtils();
@@ -55,7 +55,7 @@ export function UrlView(
               <Button
                 variant="ghost"
                 onClick={async () => {
-                  await utils.url.getAnalytics.invalidate({ urlId: url.id });
+                  await utils.url.fetchAnalytics.invalidate({ urlId: url.id });
                 }}
               >
                 <RefreshCcw className={cn({ "animate-spin": isFetching })} />

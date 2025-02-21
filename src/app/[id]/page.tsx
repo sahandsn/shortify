@@ -10,7 +10,7 @@ export default async function UrlPage({
   let url;
 
   try {
-    url = await api.url.createAnalytics({ destination: id });
+    url = await api.url.createAnalytic({ destination: id });
   } catch (error) {
     console.error(error);
     redirect("/not-found");

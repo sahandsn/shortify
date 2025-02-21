@@ -6,7 +6,8 @@ export default async function DashboardPage() {
   const session = await auth();
 
   if (session?.user) {
-    void api.url.getAllPaginated.prefetch({ page: 1 });
+    void api.url.fetchUrls.prefetch({ page: 1 });
+    void api.url.countUrl.prefetch();
   }
   return (
     <HydrateClient>

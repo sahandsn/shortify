@@ -27,21 +27,21 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { URL_DESCRIPTION_LENGTH } from "@/server/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { editGenericSchema } from "@/schema/url";
+import { editSchema } from "@/schema/url";
 import type { z } from "zod";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { urlRouter } from "@/server/api/routers/url";
 
 export function UrlEdit(
   url: Readonly<
-    inferRouterOutputs<typeof urlRouter>["getAllPaginated"]["items"][number]
+    inferRouterOutputs<typeof urlRouter>["fetchUrls"]["items"][number]
   >,
 ) {
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
-  const { mutate, isPending } = api.url.editGeneric.useMutation({
+  const { mutate, isPending } = api.url.editUrl.useMutation({
     async onSuccess(response) {
-      await utils.url.getAllPaginated.invalidate();
+      await utils.url.fetchUrls.invalidate();
       form.reset();
       toast.success(response.message);
       setOpen(false);
@@ -51,8 +51,8 @@ export function UrlEdit(
     },
   });
 
-  const form = useForm<z.infer<typeof editGenericSchema>>({
-    resolver: zodResolver(editGenericSchema),
+  const form = useForm<z.infer<typeof editSchema>>({
+    resolver: zodResolver(editSchema),
     defaultValues: {
       source: url.source,
       description: url.description ?? "",

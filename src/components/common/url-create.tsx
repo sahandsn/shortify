@@ -27,15 +27,18 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { URL_DESCRIPTION_LENGTH } from "@/server/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createGenericSchema } from "@/schema/url";
+import { createSchema } from "@/schema/url";
 import type { z } from "zod";
 
 export function UrlCreate() {
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
-  const { mutate, isPending } = api.url.createGeneric.useMutation({
+  const { mutate, isPending } = api.url.createUrl.useMutation({
     async onSuccess(response) {
-      await utils.url.getAllPaginated.invalidate();
+      await Promise.all([
+        utils.url.fetchUrls.invalidate(),
+        utils.url.countUrl.invalidate(),
+      ]);
       form.reset();
       toast.success(response.message);
       setOpen(false);
@@ -45,8 +48,8 @@ export function UrlCreate() {
     },
   });
 
-  const form = useForm<z.infer<typeof createGenericSchema>>({
-    resolver: zodResolver(createGenericSchema),
+  const form = useForm<z.infer<typeof createSchema>>({
+    resolver: zodResolver(createSchema),
     defaultValues: {
       source: "",
       description: "",
