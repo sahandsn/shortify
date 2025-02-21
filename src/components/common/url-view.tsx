@@ -5,19 +5,24 @@ import type { inferRouterOutputs } from "@trpc/server";
 import Link from "next/link";
 import { api } from "@/trpc/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"; // Assuming Shadcn Chart
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts"; // Fallback if Shadcn Chart isn’t available
-import { H3, P, Small } from "../ui/typography";
-import { ChartNoAxesCombined, CheckCheck, Copy } from "lucide-react";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import { H3 } from "../ui/typography";
+import {
+  ChartNoAxesCombined,
+  CheckCheck,
+  Copy,
+  RefreshCcw,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "@mantine/hooks";
 import { env } from "@/env";
+import { cn } from "@/lib/utils";
 
 export function UrlView(
   url: Readonly<
@@ -25,19 +30,14 @@ export function UrlView(
   >,
 ) {
   const clipboard = useClipboard({ timeout: 1000 });
-  const { data, isError, error } = api.url.getAnalytics.useQuery({
+  const { data, isError, error, isFetching } = api.url.getAnalytics.useQuery({
     urlId: url.id,
   });
+  const utils = api.useUtils();
 
-  if (isError) {
-    console.error(error);
-    return <div>Error loading analytics: {error.message}</div>;
-  }
-
-  // Prepare chart data (transform `data.data` if needed)
   const chartData =
     data?.data?.map((item) => ({
-      date: new Date(item.date).toLocaleDateString(), // Format date for readability
+      date: new Date(item.date).toLocaleDateString(),
       count: item.count,
     })) ?? [];
   const totalCount = chartData.reduce((total, current) => {
@@ -50,15 +50,24 @@ export function UrlView(
         <CardTitle className="flex flex-wrap items-center justify-between">
           <H3>
             <Link href={url.destination} target="_blank">
-              <span className="text-muted-foreground">/</span>
-              {url.destination}
+              /{url.destination}
             </Link>
           </H3>
           <section className="flex gap-1">
-            <Button variant="ghost">
-              <ChartNoAxesCombined />
-              {totalCount} click(s)
-            </Button>
+            <section>
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  await utils.url.getAnalytics.invalidate({ urlId: url.id });
+                }}
+              >
+                <RefreshCcw className={cn({ "animate-spin": isFetching })} />
+              </Button>
+              <Button variant="ghost">
+                <ChartNoAxesCombined />
+                {totalCount} click(s)
+              </Button>
+            </section>
 
             <Separator orientation="vertical" className="m-auto h-4" />
             <section>
@@ -78,41 +87,46 @@ export function UrlView(
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {/* <div className="mt-4">
-          <ChartContainer
-            config={{
-              count: {
-                label: "Clicks",
-                color: "cyan",
-              },
-            }}
-            className="h-[200px] w-full"
-          >
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis
-                dataKey="date"
-                type="category"
-                stroke="#fff"
-                tick={{ fill: "#fff" }}
-              />
-              <YAxis
-                dataKey="count"
-                type="number"
-                stroke="#fff"
-                tick={{ fill: "#fff" }}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line
-                type="monotone"
-                dataKey="count"
-                stroke="cyan"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ChartContainer>
-        </div> */}
+        <div>
+          {isError ? (
+            <p>Error loading analytics: {error.message}</p>
+          ) : (
+            <ChartContainer
+              config={{
+                count: {
+                  label: "Clicks",
+                  color: "cyan",
+                },
+              }}
+              className="h-[200px] w-full"
+            >
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis
+                  dataKey="date"
+                  type="category"
+                  stroke="#fff"
+                  tick={{ fill: "#fff" }}
+                />
+                <YAxis
+                  dataKey="count"
+                  type="number"
+                  stroke="#fff"
+                  tick={{ fill: "#fff" }}
+                  allowDecimals={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="cyan"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ChartContainer>
+          )}
+        </div>
 
         <section className="space-y-2 text-sm text-muted-foreground">
           <p>{url.source}</p>

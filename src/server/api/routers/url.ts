@@ -55,7 +55,7 @@ export const urlRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const limit = 6;
+      const limit = 4;
       const offset = (input.page - 1) * limit;
 
       // Get paginated URLs for current user
