@@ -13,12 +13,7 @@ import {
 } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { H3 } from "../ui/typography";
-import {
-  ChartNoAxesCombined,
-  CheckCheck,
-  Copy,
-  RefreshCcw,
-} from "lucide-react";
+import { CheckCheck, Copy, RefreshCcw } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "@mantine/hooks";
 import { env } from "@/env";
@@ -63,9 +58,6 @@ export function UrlView(
                 }}
               >
                 <RefreshCcw className={cn({ "animate-spin": isFetching })} />
-              </Button>
-              <Button variant="ghost">
-                <ChartNoAxesCombined />
                 {totalCount} click(s)
               </Button>
             </section>
