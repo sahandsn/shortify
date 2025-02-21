@@ -23,10 +23,10 @@ export const urlRouter = createTRPCRouter({
     }),
 
   createAnalytics: protectedProcedure
-    .input(z.object({ source: z.string().url() }))
+    .input(z.object({ destination: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const url = await ctx.db.query.urls.findFirst({
-        where: eq(urls.source, input.source),
+        where: eq(urls.destination, input.destination),
       });
 
       if (!url) {
