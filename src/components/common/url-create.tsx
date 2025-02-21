@@ -101,7 +101,7 @@ export function UrlCreate() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-sm">
                     {form.watch("description")?.length ?? 0}/
                     {URL_DESCRIPTION_LENGTH}
                   </FormDescription>
