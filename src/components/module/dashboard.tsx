@@ -12,21 +12,21 @@ export function Dashboard() {
     page: currentPage,
   });
   return (
-    <main>
+    <main className="space-y-8">
       <H1>Dashboard</H1>
       {allUrl.items.length > 0 ? (
-        <>
-          <List>
+        <section className="space-y-8">
+          <section className="flex grid-cols-2 flex-col gap-4 md:grid">
             {allUrl.items.map((item) => (
               <UrlView {...item} key={item.id} />
             ))}
-          </List>
+          </section>
           <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalPages={allUrl.pagination.totalPages}
           />
-        </>
+        </section>
       ) : (
         <p>Add a url first.</p>
       )}
