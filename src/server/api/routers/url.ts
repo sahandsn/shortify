@@ -5,8 +5,6 @@ import { urlAnalytics, urls } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { createGenericSchema } from "@/schema/url";
 
-
-
 export const urlRouter = createTRPCRouter({
   getLatest: protectedProcedure.query(async ({ ctx }) => {
     const url = await ctx.db.query.urls.findFirst({
@@ -24,6 +22,7 @@ export const urlRouter = createTRPCRouter({
         .values({
           source: input.source,
           userId: ctx.session.user.id,
+          description: input.description,
         })
         .returning();
       if (createdUrls.length === 0) {
