@@ -32,6 +32,7 @@ export function Home() {
             variant: "outline",
             size: "lg",
           })}
+          target="_blank"
         >
           <Image alt="github" src="/github.svg" width={20} height={20} />
           <span>Star on GitHub</span>
