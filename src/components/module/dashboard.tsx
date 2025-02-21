@@ -4,7 +4,7 @@ import { api } from "@/trpc/react";
 import { useState } from "react";
 import { Pagination } from "../common/pagination";
 import { H1, List } from "../ui/typography";
-import Link from "next/link";
+import { UrlView } from "../common/url-view";
 
 export function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,9 +16,7 @@ export function Dashboard() {
       <H1>Dashboard</H1>
       <List>
         {allUrl.items.map((item) => (
-          <Link href={item.destination} key={item.id} target="_blank">
-            <li>{item.destination}</li>
-          </Link>
+          <UrlView {...item} key={item.id} />
         ))}
       </List>
       <Pagination

@@ -1,4 +1,5 @@
 import { api } from "@/trpc/server";
+import { redirect } from "next/navigation";
 
 export default async function UrlPage({
   params,
@@ -12,6 +13,6 @@ export default async function UrlPage({
     return <main>My Post: {url.source}</main>;
   } catch (error) {
     console.error(error);
-    return <main>Not found.</main>;
+    redirect("/not-found");
   }
 }
