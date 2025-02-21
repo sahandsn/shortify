@@ -7,12 +7,15 @@ export default async function UrlPage({
   params: Promise<{ id: string }>;
 }>) {
   const id = (await params).id;
-  try {
-    const url = await api.url.createAnalytics({ destination: id });
+  let url;
 
-    return <main>My Post: {url.source}</main>;
+  try {
+    url = await api.url.createAnalytics({ destination: id });
+    console.log(url.source);
   } catch (error) {
     console.error(error);
     redirect("/not-found");
   }
+
+  redirect(url.source);
 }
