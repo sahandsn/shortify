@@ -66,17 +66,15 @@
     @apply bg-background text-foreground;
   }
   header {
-    @apply wrapper;
     height: var(--header-height);
   }
   main {
     @apply wrapper;
-    height: calc(100vh - var(--header-height));
   }
 }
 @layer utilities {
   .wrapper {
-    @apply container mx-auto px-4;
+    @apply container mx-auto p-4;
   }
 }
 

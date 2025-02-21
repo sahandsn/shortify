@@ -19,6 +19,7 @@ import { useClipboard } from "@mantine/hooks";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
 import { UrlDelete } from "./url-delete";
+import { UrlEdit } from "./url-edit";
 
 export function UrlView(
   url: Readonly<
@@ -75,6 +76,7 @@ export function UrlView(
               >
                 {clipboard.copied ? <CheckCheck /> : <Copy />}
               </Button>
+              <UrlEdit {...url} />
               <UrlDelete {...url} />
             </section>
           </section>
@@ -92,7 +94,7 @@ export function UrlView(
                   color: "cyan",
                 },
               }}
-              className="h-[200px] w-full"
+              className="m-auto h-[200px] w-full"
             >
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -127,7 +129,9 @@ export function UrlView(
           <section className="flex flex-wrap justify-between gap-2">
             <p>{url.description}</p>
 
-            <p>{new Date(url.createdAt).toLocaleDateString()}</p>
+            <p className="ms-auto">
+              {new Date(url.createdAt).toLocaleDateString()}
+            </p>
           </section>
         </section>
       </CardContent>

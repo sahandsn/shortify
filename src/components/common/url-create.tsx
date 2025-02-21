@@ -9,8 +9,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { type urlRouter } from "@/server/api/routers/url";
-import type { inferRouterInputs } from "@trpc/server";
 import { Link, Loader2 } from "lucide-react";
 import { api } from "@/trpc/react";
 import { useForm } from "react-hook-form";
@@ -30,6 +28,7 @@ import { Textarea } from "../ui/textarea";
 import { URL_DESCRIPTION_LENGTH } from "@/server/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createGenericSchema } from "@/schema/url";
+import type { z } from "zod";
 
 export function UrlCreate() {
   const utils = api.useUtils();
@@ -46,7 +45,7 @@ export function UrlCreate() {
     },
   });
 
-  const form = useForm<inferRouterInputs<typeof urlRouter>["createGeneric"]>({
+  const form = useForm<z.infer<typeof createGenericSchema>>({
     resolver: zodResolver(createGenericSchema),
     defaultValues: {
       source: "",
@@ -101,7 +100,13 @@ export function UrlCreate() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="text-sm">
+                  <FormDescription
+                    className={cn("text-sm", {
+                      "text-destructive":
+                        (form.watch("description")?.length ?? 0) >
+                        URL_DESCRIPTION_LENGTH,
+                    })}
+                  >
                     {form.watch("description")?.length ?? 0}/
                     {URL_DESCRIPTION_LENGTH}
                   </FormDescription>

@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { eq, count } from "drizzle-orm";
+import { eq, count, and, ilike, or } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { urlAnalytics, urls } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { createGenericSchema } from "@/schema/url";
+import { createGenericSchema, editGenericSchema } from "@/schema/url";
 
 export const urlRouter = createTRPCRouter({
   getLatest: protectedProcedure.query(async ({ ctx }) => {
@@ -32,6 +32,43 @@ export const urlRouter = createTRPCRouter({
         });
       }
       return { rows: createdUrls, message: "URL added successfully!" };
+    }),
+  editGeneric: protectedProcedure
+    .input(editGenericSchema)
+    .mutation(async ({ ctx, input }) => {
+      const existingUrl = await ctx.db.query.urls.findFirst({
+        where: (urls, { and, eq }) =>
+          and(eq(urls.id, input.id), eq(urls.userId, ctx.session.user.id)),
+      });
+
+      if (!existingUrl) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "URL not found or you don't have permission to edit it",
+        });
+      }
+
+      const [updatedUrl] = await ctx.db
+        .update(urls)
+        .set({
+          source: input.source,
+          description: input.description,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(urls.id, input.id), eq(urls.userId, ctx.session.user.id)))
+        .returning();
+
+      if (!updatedUrl) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update URL",
+        });
+      }
+
+      return {
+        row: updatedUrl,
+        message: "URL updated successfully!",
+      };
     }),
   deleteGeneric: protectedProcedure
     .input(
@@ -79,25 +116,33 @@ export const urlRouter = createTRPCRouter({
     .input(
       z.object({
         page: z.number().min(1).default(1),
+        query: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const limit = 4;
       const offset = (input.page - 1) * limit;
 
-      // Get paginated URLs for current user
+      const searchConditions = input.query
+        ? or(
+            ilike(urls.source, `%${input.query}%`),
+            ilike(urls.description, `%${input.query}%`),
+          )
+        : undefined;
+
       const [items, totalCountResult] = await Promise.all([
         ctx.db.query.urls.findMany({
-          where: eq(urls.userId, ctx.session.user.id),
+          where: and(eq(urls.userId, ctx.session.user.id), searchConditions),
           orderBy: (urls, { desc }) => [desc(urls.createdAt)],
           offset,
-          limit: limit,
+          limit,
         }),
         ctx.db
           .select({ count: count() })
           .from(urls)
-          .where(eq(urls.userId, ctx.session.user.id)),
+          .where(and(eq(urls.userId, ctx.session.user.id), searchConditions)),
       ]);
+
       const totalCount = totalCountResult[0]?.count ?? 0;
 
       return {
