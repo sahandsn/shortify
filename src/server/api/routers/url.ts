@@ -99,7 +99,7 @@ export const urlRouter = createTRPCRouter({
 
       const data = await ctx.db.query.urlAnalytics
         .findMany({
-          where: eq(urls.id, input.urlId),
+          where: eq(urlAnalytics.urlId, input.urlId),
           orderBy: (urlAnalytics, { desc }) => [desc(urlAnalytics.timestamp)],
         })
         .then((analytics) => {
@@ -124,7 +124,6 @@ export const urlRouter = createTRPCRouter({
               return a.date.localeCompare(b.date);
             });
         });
-
       return {
         data,
       };

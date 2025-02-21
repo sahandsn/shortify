@@ -10,7 +10,12 @@ export function UrlView(
     inferRouterOutputs<typeof urlRouter>["getAllPaginated"]["items"][number]
   >,
 ) {
-  const { data } = api.url.getAnalytics.useQuery({ urlId: url.id });
+  const { data, isError, error } = api.url.getAnalytics.useQuery({
+    urlId: url.id,
+  });
+  if (isError) {
+    console.error(error);
+  }
   return (
     <Link href={url.destination} target="_blank">
       <li>{url.destination}</li>
