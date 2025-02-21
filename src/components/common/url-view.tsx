@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { useClipboard } from "@mantine/hooks";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
-import { UrlDelete } from "./url-actions";
+import { UrlDelete } from "./url-delete";
 
 export function UrlView(
   url: Readonly<

@@ -3,6 +3,9 @@ import { eq, count } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { urlAnalytics, urls } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
+import { createGenericSchema } from "@/schema/url";
+
+
 
 export const urlRouter = createTRPCRouter({
   getLatest: protectedProcedure.query(async ({ ctx }) => {
@@ -14,17 +17,22 @@ export const urlRouter = createTRPCRouter({
   }),
 
   createGeneric: protectedProcedure
-    .input(
-      z.object({
-        source: z.string().url(),
-        description: z.string().optional(),
-      }),
-    )
+    .input(createGenericSchema)
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.insert(urls).values({
-        source: input.source,
-        userId: ctx.session.user.id,
-      });
+      const createdUrls = await ctx.db
+        .insert(urls)
+        .values({
+          source: input.source,
+          userId: ctx.session.user.id,
+        })
+        .returning();
+      if (createdUrls.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "URL was not added",
+        });
+      }
+      return { rows: createdUrls, message: "URL added successfully!" };
     }),
   deleteGeneric: protectedProcedure
     .input(

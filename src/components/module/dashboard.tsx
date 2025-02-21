@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Pagination } from "../common/pagination";
 import { H1 } from "../ui/typography";
 import { UrlView } from "../common/url-view";
+import { UrlCreate } from "../common/url-create";
 
 export function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,6 +15,9 @@ export function Dashboard() {
   return (
     <main className="space-y-8">
       <H1>Dashboard</H1>
+      <section>
+        <UrlCreate />
+      </section>
       {allUrl.items.length > 0 ? (
         <section className="space-y-8">
           <section className="flex grid-cols-2 flex-col gap-4 md:grid">

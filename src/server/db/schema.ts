@@ -12,6 +12,8 @@ import {
 import { type AdapterAccount } from "next-auth/adapters";
 import { nanoid } from "nanoid";
 
+export const URL_DESCRIPTION_LENGTH = 255;
+
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
@@ -157,7 +159,7 @@ export const urls = createTable(
       .notNull()
       .$defaultFn(() => nanoid(6)),
     source: varchar("source").notNull(),
-    description: varchar("description", { length: 255 }),
+    description: varchar("description", { length: URL_DESCRIPTION_LENGTH }),
   },
   (url) => ({
     destinationIdx: index("destination_idx").on(url.destination),
