@@ -29,7 +29,7 @@ export function Home() {
         <Link
           href="https://github.com/sahandsn/shortify"
           className={buttonVariants({
-            variant: "outline",
+            variant: "secondary",
             size: "lg",
           })}
           target="_blank"
