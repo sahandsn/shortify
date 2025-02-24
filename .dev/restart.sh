@@ -1,8 +1,8 @@
-echo "\n\n\n\n------------------------------------\nRunning: git checkout main\n------------------------------------\n\n\n\n"
-git checkout main
+echo "\n\n\n\n------------------------------------\nRunning: sudo git checkout main\n------------------------------------\n\n\n\n"
+sudo git checkout main
 
-echo "\n\n\n\n------------------------------------\nRunning: git pull\n------------------------------------\n\n\n\n"
-git pull
+echo "\n\n\n\n------------------------------------\nRunning: sudo git pull\n------------------------------------\n\n\n\n"
+sudo git pull
 
 echo "\n\n\n\n------------------------------------\nRunning: cd /projects/shortify\n------------------------------------\n\n\n\n"
 cd /projects/shortify
