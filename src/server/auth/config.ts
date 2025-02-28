@@ -20,8 +20,6 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // business logic
-      proVerified: boolean;
     } & DefaultSession["user"];
   }
 }
