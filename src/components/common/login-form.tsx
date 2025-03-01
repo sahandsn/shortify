@@ -26,6 +26,7 @@ import {
 } from "../ui/form";
 import { handleCredentialsLogin, handleDiscordLogin } from "@/lib/actions";
 import { Separator } from "../ui/separator";
+import { hashPassword } from "@/lib/credential";
 
 export function LoginForm({
   className,
@@ -41,6 +42,13 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <button
+        onClick={async () => {
+          console.log(await hashPassword("123456"));
+        }}
+      >
+        hash
+      </button>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
