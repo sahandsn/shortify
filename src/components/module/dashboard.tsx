@@ -21,11 +21,11 @@ export function Dashboard() {
     setCurrentPage(1);
   }, 500);
 
-  const [allUrl] = api.url.fetchUrls.useSuspenseQuery({
+  const { data: allUrl } = api.url.fetchUrls.useQuery({
     page: currentPage,
     query: val,
   });
-  const [count] = api.url.countUrl.useSuspenseQuery();
+  const { data: count } = api.url.countUrl.useQuery();
 
   return (
     <main className="space-y-8">
@@ -45,17 +45,15 @@ export function Dashboard() {
           <UrlCreate />
         </section>
       </section>
-      {allUrl.items.length > 0 ? (
+      {(allUrl?.items.length ?? 0) > 0 ? (
         <section className="space-y-8">
           <section className="flex grid-cols-2 flex-col gap-4 md:grid">
-            {allUrl.items.map((item) => (
-              <UrlView {...item} key={item.id} />
-            ))}
+            {allUrl?.items.map((item) => <UrlView {...item} key={item.id} />)}
           </section>
           <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            totalPages={allUrl.pagination.totalPages}
+            totalPages={allUrl?.pagination.totalPages ?? 0}
           />
         </section>
       ) : (
