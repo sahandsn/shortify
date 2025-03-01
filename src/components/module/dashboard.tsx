@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pagination } from "../common/pagination";
 import { H1 } from "../ui/typography";
 import { UrlView } from "../common/url-view";
@@ -17,6 +17,10 @@ export function Dashboard() {
   const [val, setVal] = useState("");
 
   const [debouncedVal] = useDebouncedValue(val, 1000);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedVal]);
+
   const [allUrl] = api.url.fetchUrls.useSuspenseQuery({
     page: currentPage,
     query: debouncedVal,
