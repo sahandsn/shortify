@@ -1,14 +1,14 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pagination } from "../common/pagination";
 import { H1 } from "../ui/typography";
 import { UrlView } from "../common/url-view";
 import { UrlCreate } from "../common/url-create";
 import { Input } from "../common/input";
 import { Package, Search } from "lucide-react";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedCallback } from "@mantine/hooks";
 import { Button } from "../ui/button";
 import { MAX_URL_COUNT } from "@/assets";
 
@@ -16,14 +16,14 @@ export function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [val, setVal] = useState("");
 
-  const [debouncedVal] = useDebouncedValue(val, 1000);
-  useEffect(() => {
+  const handleSearch = useDebouncedCallback((query: string) => {
+    setVal(query);
     setCurrentPage(1);
-  }, [debouncedVal]);
+  }, 500);
 
   const [allUrl] = api.url.fetchUrls.useSuspenseQuery({
     page: currentPage,
-    query: debouncedVal,
+    query: val,
   });
   const [count] = api.url.countUrl.useSuspenseQuery();
 
@@ -35,8 +35,7 @@ export function Dashboard() {
           className="sm:max-w-[300px]"
           placeholder="Search"
           startIcon={Search}
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         <section className="flex items-center gap-2">
           <Button variant="secondary">
