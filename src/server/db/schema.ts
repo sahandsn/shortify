@@ -21,27 +21,6 @@ export const URL_DESCRIPTION_LENGTH = 255;
  */
 export const createTable = pgTableCreator((name) => `shortify_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
-
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -54,13 +33,11 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
-  // password: varchar("password", { length: 255 }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   urls: many(users),
-  referrals: many(referrals),
 }));
 
 export const accounts = createTable(
@@ -196,42 +173,5 @@ export const urlAnalyticsRelations = relations(urlAnalytics, ({ one }) => ({
   url: one(urls, {
     fields: [urlAnalytics.urlId],
     references: [urls.id],
-  }),
-}));
-
-export const referrals = createTable(
-  "referral",
-  {
-    id: varchar("id", { length: 255 })
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    referrerId: varchar("referrer_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    referredId: varchar("referred_id", { length: 255 }).references(
-      () => users.id,
-    ),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  (referral) => ({
-    referrerIdIdx: index("referrer_id_idx").on(referral.referrerId),
-    referredIdIdx: index("referred_id_idx").on(referral.referredId),
-  }),
-);
-
-export const referralsRelations = relations(referrals, ({ one }) => ({
-  referrer: one(users, {
-    fields: [referrals.referrerId],
-    references: [users.id],
-  }),
-  referred: one(users, {
-    fields: [referrals.referredId],
-    references: [users.id],
   }),
 }));
