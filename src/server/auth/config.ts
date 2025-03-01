@@ -1,6 +1,7 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "@/server/db";
 import {
@@ -9,6 +10,8 @@ import {
   users,
   verificationTokens,
 } from "@/server/db/schema";
+import { credentialsSchema } from "@/schema/credential";
+import { verifyPassword } from "@/lib/credential";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,6 +23,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      passwordHash?: string;
     } & DefaultSession["user"];
   }
 }
@@ -32,15 +36,42 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        // Validate credentials with Zod
+        const parsed = credentialsSchema.safeParse(credentials);
+        if (!parsed.success) {
+          return null;
+        }
+
+        const { email, password } = parsed.data;
+
+        // Find user in database
+        const user = await db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.email, email),
+        });
+
+        // Verify password
+        if (
+          user?.passwordHash &&
+          (await verifyPassword(password, user.passwordHash))
+        ) {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          };
+        }
+
+        return null;
+      },
+    }),
   ],
   adapter: DrizzleAdapter(db, {
     usersTable: users,
